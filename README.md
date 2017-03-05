@@ -1,3 +1,5 @@
+# Exploration of C++ implementation. --JJ-S
+
 # Mirror repository of Shen code
 
 **Important**: this mirror exists to keep track of changes across releases for reference purposes. **You will not find complete Shen releases here**. This repository may also be updated destructively to include older releases or retroactively track new files.
