@@ -15,12 +15,12 @@ X : cxx/symbol
 
 
 ** Environment type
-** Obj: the catchall type with maximal entropy.  If the type of a variable can't be statically proven, it defaults to Obj.
-Fact: For any unknown type variable T, $\K T ~ \K Obj$.
+** Any: the catchall type with maximal entropy.  If the type of a variable can't be statically proven, it defaults to Any.
+Fact: For any unknown type variable T, $\K T ~ \K Any$.
 ** List<T> type
 *** Entropy: Given an object of type List<T>, the entropy depends on both T and the length of the list:
  L : (list T) ⇒ $\K L ~ (length L)\cdot \K T$,
-where $\K T$ is the prefix complexity of an average object of type T.  If the actual value of T isn't known statically, then we fall back to a List<Obj>, where Obj is the catchall type.  It's tantamount to saying that the list can be heterogeneous.
+where $\K T$ is the prefix complexity of an average object of type T.  If the actual value of T isn't known statically, then we fall back to a List<Any>, where Any is the catchall type.  It's tantamount to saying that the list can be heterogeneous.
 
 
 
