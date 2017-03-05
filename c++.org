@@ -1,6 +1,8 @@
 * Thoughts on C++ implementation.
 
+
 * TODO Entropy question: What's the difference, or the relationship, between the "entropy" of a type T and the complexity of an arbitrary object X : T?
+
 
 * Types
 ** Symbol type
@@ -16,17 +18,24 @@ X : c.variable
 ============
 X : c.symbol
 *** Variable type: Dependent type; a symbol beginning with an uppercase letter
-
+** TODO S-expression type (for compiling)
 ** TODO Environment type
    - Datum: Pointer to parent Environment
    - Data: mapping from Symbols to values: 
      - map<symbol, Any>, where 'map' is an ADT map, i.e., a concept; the concrete type could use std::ordered_map or std::unordered_map.
      - (map c.symbol Any)
-
-** bind: Environment, Symbol -> Environment
+** Symbol-table type: global bindings.  Dual-namespace: access to both function and value bindings.
+   - Map ADT: string → symbol; map<string,symbol>
+   - TODO: Implement as a std::unordered_map<string,symbol>?
+** c.bind: Environment, Symbol -> Environment
    - Partial function, maybe?  (Error if already bound)
    - c.bind : c.environment → c.symbol → c.environment
-     
+       
+** c.intern : Symbol table, Symbol → Symbol table
+   - c.intern_maybe : symbol-table → symbol → symbol-table
+     Does nothing if (c.symbol-defined? symbol-table symbol)=false.
+   - c.intern_definitely : symbol-table → symbol → symbol-table
+     Clobbers existing entry.
 ** Any: the catchall type with maximal entropy.  If the type of a variable can't be statically proven, it defaults to Any.
 Fact: For any unknown type variable T, $\K T ~ \K Any$.
 *** X : Any ⇒ (static X) = false, because entropy of Any is infinite(?)
@@ -44,5 +53,36 @@ where $\K T$ is the prefix complexity of an average object of type T.  If the ac
 Given a func F : (c.function A B), if $A$ and $B$ are zero-entropy types, then what is $\K F$?  TODO.  Less than that of (c.function Any Any) ?
 *** apply: Function, List<Any> -> Any; this is an uncurried function.
     - Shen notation:
-    apply : (c.function (c.list Any) Any) → (c.list Any) → Any
-    where (c.function (c.list Any) Any) is the type of a completely dynamic function: the arity of arguments, and their types, are unknown.
+    apply : (c.function c.tuple Any) → c.tuple → Any
+    where (c.function c.tuple Any) is the type of a completely dynamic function: the arity of arguments, and their types, are unknown.
+      - (apply) is partial: if the concrete type of the argument tuple doesn't match that of the c.function, (apply) errors.
+
+** Tuple type
+*** Entropy: By default, a c.tuple has infinite dynamic entropy.
+    - But if we refine the type as (c.tuple (c.list c.type)), then we have a list of types, L : (c.list c.type), whose complexity is 
+      $$ \K L ~ (length L) \cdot \K c.type $$
+    And for T : (c.tuple L), the complexity $\K T ~ \K L$.
+
+** Char type: c.char
+   - $\K c.char$ is the complexity of an average character
+
+
+* Kλ
+** intern: c.symbol -> void
+   Define Kλ|-(intern):
+   (defun (s)
+     (c.intern (get-root-environment) s))
+
+** defun: 
+
+#+begin_src lisp
+  (def (name parmlist body)
+      (c.bind (get-root-environment)
+           TODO))
+#+end_src
+
+** Number type: c.number
+** boolean type: c.bool
+   - Entropy is easy: 1 bit, right?
+** string type: c.string
+   - Complexity: $$ \forall S \in c.string. \K S ~ (length S)\cdot \K c.char $$
