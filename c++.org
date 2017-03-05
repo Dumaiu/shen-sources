@@ -1,30 +1,40 @@
 * Thoughts on C++ implementation.
 
+* TODO Entropy question: What's the difference, or the relationship, between the "entropy" of a type T and the complexity of an arbitrary object X : T?
+
 * Types
 ** Symbol type
- 'If a symbol occurs immediately after an opening parenthesis, it must denote a function and should be parsed as such. If it occurs within a list or as an argument to a function it should be parsed as an innocent symbol.'
-
+   - 'If a symbol occurs immediately after an opening parenthesis, it must denote a function and should be parsed as such. If it occurs within a list or as an argument to a function it should be parsed as an innocent symbol.'
+   - 'You should read up in the Shen specification about non-standard vectors and print vectors. Essentially if innocent symbols are missing from the platform language, we recommend using print vectors to encode them. An innocent symbol is therefore representable as a print vector composed of two elements; a function called (e.g) print-symbol and a string representation of the symbol.'
+*** Hierarchy:
  Symbol :> Variable
  Symbol :> Literal
 
  Sequent form:
 
-X : cxx/variable
+X : c/variable
 ============
-X : cxx/symbol
-
+X : c/symbol
+*** Variable type: Dependent type; a symbol beginning with an uppercase letter
 
 ** Environment type
+   - Pointer to parent Environment
+     
 ** Any: the catchall type with maximal entropy.  If the type of a variable can't be statically proven, it defaults to Any.
 Fact: For any unknown type variable T, $\K T ~ \K Any$.
-** List<T> type
+*** X : Any ⇒ (static X) = false, because entropy of Any is infinite(?)
+
+** List<T> type: parametric polymorphism
 *** Entropy: Given an object of type List<T>, the entropy depends on both T and the length of the list:
  L : (list T) ⇒ $\K L ~ (length L)\cdot \K T$,
 where $\K T$ is the prefix complexity of an average object of type T.  If the actual value of T isn't known statically, then we fall back to a List<Any>, where Any is the catchall type.  It's tantamount to saying that the list can be heterogeneous.
+   - We could say that a List be 'static' if both the length and type have zero uncertainty:
+     $$ L : (list T) \tack (static (length L)) \land (static T) \Rightarrow (static L) $$
 
-
-
-
-
-
-
+** Function type, '(function Any Any)'
+   - High-entropy type.  Short for Function<A,B> (std::function<B(A)>), or, to use Shen notation, (function A B), meaning, a function typeable as { A --> B }.
+*** Entropy:
+Given a func F : (function A B), if $A$ and $B$ are zero-entropy types, then what is $\K F$?  TODO.  Less than that of (function Any Any) ?
+*** apply: Function, Any -> Any
+    - Shen notation:
+    apply : (function Any Any) → Any → Any
