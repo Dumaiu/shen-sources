@@ -12,29 +12,37 @@
 
  Sequent form:
 
-X : c/variable
+X : c.variable
 ============
-X : c/symbol
+X : c.symbol
 *** Variable type: Dependent type; a symbol beginning with an uppercase letter
 
-** Environment type
-   - Pointer to parent Environment
+** TODO Environment type
+   - Datum: Pointer to parent Environment
+   - Data: mapping from Symbols to values: 
+     - map<symbol, Any>, where 'map' is an ADT map, i.e., a concept; the concrete type could use std::ordered_map or std::unordered_map.
+     - (map c.symbol Any)
+
+** bind: Environment, Symbol -> Environment
+   - Partial function, maybe?  (Error if already bound)
+   - c.bind : c.environment → c.symbol → c.environment
      
 ** Any: the catchall type with maximal entropy.  If the type of a variable can't be statically proven, it defaults to Any.
 Fact: For any unknown type variable T, $\K T ~ \K Any$.
 *** X : Any ⇒ (static X) = false, because entropy of Any is infinite(?)
 
-** List<T> type: parametric polymorphism
+** List<T> type: parametric polymorphism.  (c.list T)
 *** Entropy: Given an object of type List<T>, the entropy depends on both T and the length of the list:
- L : (list T) ⇒ $\K L ~ (length L)\cdot \K T$,
+ $$ L : (c.list T) \Rightarrow \K L ~ (length L)\cdot \K T $$,
 where $\K T$ is the prefix complexity of an average object of type T.  If the actual value of T isn't known statically, then we fall back to a List<Any>, where Any is the catchall type.  It's tantamount to saying that the list can be heterogeneous.
    - We could say that a List be 'static' if both the length and type have zero uncertainty:
-     $$ L : (list T) \tack (static (length L)) \land (static T) \Rightarrow (static L) $$
+     $$ L : (c.list T) \tack (static (length L)) \land (static T) \Rightarrow (static L) $$
 
-** Function type, '(function Any Any)'
-   - High-entropy type.  Short for Function<A,B> (std::function<B(A)>), or, to use Shen notation, (function A B), meaning, a function typeable as { A --> B }.
+** Function type, '(c.function Any Any)'
+   - High-entropy type.  Short for Function<A,B> (std::function<B(A)>), or, to use Shen notation, (c.function A B), meaning, a function typeable as { A --> B }.
 *** Entropy:
-Given a func F : (function A B), if $A$ and $B$ are zero-entropy types, then what is $\K F$?  TODO.  Less than that of (function Any Any) ?
-*** apply: Function, Any -> Any
+Given a func F : (c.function A B), if $A$ and $B$ are zero-entropy types, then what is $\K F$?  TODO.  Less than that of (c.function Any Any) ?
+*** apply: Function, List<Any> -> Any; this is an uncurried function.
     - Shen notation:
-    apply : (function Any Any) → Any → Any
+    apply : (c.function (c.list Any) Any) → (c.list Any) → Any
+    where (c.function (c.list Any) Any) is the type of a completely dynamic function: the arity of arguments, and their types, are unknown.
